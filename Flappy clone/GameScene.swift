@@ -12,6 +12,7 @@ import GameplayKit
 class GameScene: SKScene {
     
     var pajaro = SKSpriteNode()
+    var colorCielo = SKColor()
     
     override func didMove(to view: SKView) {
         
@@ -39,23 +40,40 @@ class GameScene: SKScene {
         let texturaCielo = SKTexture(imageNamed: "cielo")
         texturaCielo.filteringMode = SKTextureFilteringMode.nearest
         
-        print("texturacielo: \(texturaCielo.size())")
+        let movimientoCielo = SKAction.moveBy(x: -texturaCielo.size().width, y: 0.0, duration: TimeInterval(0.05*texturaCielo.size().width))
+        let resetCielo = SKAction.moveBy(x: texturaCielo.size().width, y: 0.0, duration: 0.0)
+        let cieloContinuo = SKAction.repeatForever(SKAction.sequence([movimientoCielo, resetCielo]))
         
         var i:CGFloat = 0
         while i < 2 + self.frame.size.width / (texturaCielo.size().width) {
             let fraccionCielo = SKSpriteNode(texture: texturaCielo)
-            print("condicion: \(2 + self.frame.size.width / (texturaCielo.size().width))")
-            print("fraccioncielo: \(fraccionCielo.size.width)")
-            print("fraccioncielo: \(fraccionCielo.size.height)")
             
             fraccionCielo.zPosition = -99
-            fraccionCielo.position = CGPoint(x: i * fraccionCielo.size.width, y: fraccionCielo.size.height-90)
+            fraccionCielo.position = CGPoint(x: i * fraccionCielo.size.width, y: fraccionCielo.size.height-130)
         
+            fraccionCielo.run(cieloContinuo)
             self.addChild(fraccionCielo)
-            print("fraccioncielo position: \(fraccionCielo.position)")
             i += 1
         }
-
+        
+        colorCielo = SKColor(red: 115/255, green: 195/255, blue: 207/255, alpha: 1.0)
+        self.backgroundColor = colorCielo
+        
+        /******* SUELO *******/
+        
+        let texturaSuelo = SKTexture(imageNamed: "suelo")
+        texturaSuelo.filteringMode = SKTextureFilteringMode.nearest
+        
+        i = 0
+        while i < 2 + self.frame.size.width / (texturaSuelo.size().width) {
+            let fraccionSuelo = SKSpriteNode(texture: texturaSuelo)
+            
+            fraccionSuelo.zPosition = -88
+            fraccionSuelo.position = CGPoint(x: i * fraccionSuelo.size.width, y: fraccionSuelo.size.height/2.0)
+            
+            self.addChild(fraccionSuelo)
+            i += 1
+        }
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
