@@ -16,6 +16,10 @@ class GameScene: SKScene {
     
     override func didMove(to view: SKView) {
         
+        // habilita física:
+        self.physicsWorld.gravity = CGVector(dx: 0.0, dy: -5.0)
+        
+        
         /******* PAJARO *******/
         
         let texturaPajaro1 = SKTexture(imageNamed: "pajaro1")
@@ -31,8 +35,12 @@ class GameScene: SKScene {
         pajaro = SKSpriteNode(texture: texturaPajaro1)
         pajaro.position = CGPoint(x: self.frame.size.width / 2.75, y: self.frame.midY)
         pajaro.zPosition = 0
-        pajaro.run(vuelo)
         
+        pajaro.physicsBody = SKPhysicsBody(circleOfRadius: pajaro.size.height/2.0)
+        pajaro.physicsBody?.isDynamic = true
+        pajaro.physicsBody?.allowsRotation = false
+        
+        pajaro.run(vuelo)
         self.addChild(pajaro)
         
         /******* CIELO *******/
@@ -64,6 +72,10 @@ class GameScene: SKScene {
         let texturaSuelo = SKTexture(imageNamed: "suelo")
         texturaSuelo.filteringMode = SKTextureFilteringMode.nearest
         
+        let movimientoSuelo = SKAction.moveBy(x: -texturaSuelo.size().width, y: 0.0, duration: TimeInterval(0.02*texturaSuelo.size().width))
+        let resetSuelo = SKAction.moveBy(x: texturaSuelo.size().width, y: 0.0, duration: 0.0)
+        let sueloContinuo = SKAction.repeatForever(SKAction.sequence([movimientoSuelo, resetSuelo]))
+        
         i = 0
         while i < 2 + self.frame.size.width / (texturaSuelo.size().width) {
             let fraccionSuelo = SKSpriteNode(texture: texturaSuelo)
@@ -71,9 +83,17 @@ class GameScene: SKScene {
             fraccionSuelo.zPosition = -88
             fraccionSuelo.position = CGPoint(x: i * fraccionSuelo.size.width, y: fraccionSuelo.size.height/2.0)
             
+            fraccionSuelo.run(sueloContinuo)
             self.addChild(fraccionSuelo)
             i += 1
         }
+        
+        let topeSuelo = SKNode()
+        topeSuelo.position = CGPoint(x: 0, y: texturaSuelo.size().height/2.0)
+        topeSuelo.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: self.frame.size.width, height: texturaSuelo.size().height))
+        topeSuelo.physicsBody?.isDynamic = false
+        
+        self.addChild(topeSuelo)
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
